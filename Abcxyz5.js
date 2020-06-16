@@ -7,7 +7,7 @@ class encn_Cambridge_tc {
     }
 
     async displayName() {
-        return 'Cambridge EN->EN 4';
+        return 'Cambridge EN->EN Dictionary 5';
     }
 
     setOptions(options) {
@@ -17,7 +17,7 @@ class encn_Cambridge_tc {
 
     async findTerm(word) {
         this.word = word;
-        let promises = [this.findCambridge(word)];
+        let promises = [this.findCambridge(word), this.findYoudao(word)];
         let results = await Promise.all(promises);
         return [].concat(...results).filter(x => x);
     }
@@ -44,7 +44,7 @@ class encn_Cambridge_tc {
             return [];
         }
 
-        let entries = doc.querySelectorAll('.cdo-dblclick-area .entry-body__el') || [];
+        let entries = doc.querySelectorAll('.pr .entry-body__el') || [];
         for (const entry of entries) {
             let definitions = [];
             let audios = [];
@@ -59,11 +59,11 @@ class encn_Cambridge_tc {
             }
             let pos = T(entry.querySelector('.posgram'));
             pos = pos ? `<span class='pos'>${pos}</span>` : '';
-            audios[0] = entry.querySelector('.pos-header>.uk .audio_play_button');
-            audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('data-src-mp3') : '';
+            audios[0] = entry.querySelector(".uk.dpron-i source");
+            audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
             //audios[0] = audios[0].replace('https', 'http');
-            audios[1] = entry.querySelector('.pos-header>.us .audio_play_button');
-            audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('data-src-mp3') : '';
+            audios[1] = entry.querySelector(".us.dpron-i source");
+            audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
             //audios[1] = audios[1].replace('https', 'http');
 
             let sensbodys = entry.querySelectorAll('.sense-body') || [];
@@ -84,13 +84,11 @@ class encn_Cambridge_tc {
 
                     // make definition segement
                     for (const defblock of defblocks) {
-                        let eng_tran = T(defblock.querySelector('.def-head .def'));
-                        let chn_tran = T(defblock.querySelector('.def-body .trans'));
+                        let eng_tran = T(defblock.querySelector('.ddef_h .def'));
                         if (!eng_tran) continue;
                         let definition = '';
                         eng_tran = `<span class='eng_tran'>${eng_tran.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span>`;
-                        chn_tran = `<span class='chn_tran'>${chn_tran}</span>`;
-                        let tran = `<span class='tran'>${eng_tran}${chn_tran}</span>`;
+                        let tran = `<span class='tran'>${eng_tran}</span>`;
                         definition += phrasehead ? `${phrasehead}${tran}` : `${pos}${tran}`;
 
                         // make exmaple segement
