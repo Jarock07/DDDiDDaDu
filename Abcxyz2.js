@@ -1,5 +1,5 @@
 /* global api */
-class encn_Cambridge {
+class encn_Cambridge_tc {
     constructor(options) {
         this.options = options;
         this.maxexample = 2;
@@ -7,7 +7,7 @@ class encn_Cambridge {
     }
 
     async displayName() {
-        return 'Cambridge EN->EN Dictionary';
+        return 'Cambridge EN->EN abcxyz2';
     }
 
     setOptions(options) {
@@ -33,7 +33,7 @@ class encn_Cambridge {
                 return node.innerText.trim();
         }
 
-        let base = 'https://dictionary.cambridge.org/search/english-chinese-simplified/direct/?q=';
+        let base = 'https://dictionary.cambridge.org/search/english-chinese-traditional/direct/?q=';
         let url = base + encodeURIComponent(word);
         let doc = '';
         try {
@@ -44,7 +44,7 @@ class encn_Cambridge {
             return [];
         }
 
-        let entries = doc.querySelectorAll('.pr .entry-body__el') || [];
+        let entries = doc.querySelectorAll('.cdo-dblclick-area .entry-body__el') || [];
         for (const entry of entries) {
             let definitions = [];
             let audios = [];
@@ -59,11 +59,11 @@ class encn_Cambridge {
             }
             let pos = T(entry.querySelector('.posgram'));
             pos = pos ? `<span class='pos'>${pos}</span>` : '';
-            audios[0] = entry.querySelector(".uk.dpron-i source");
-            audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
+            audios[0] = entry.querySelector('.pos-header>.uk .audio_play_button');
+            audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('data-src-mp3') : '';
             //audios[0] = audios[0].replace('https', 'http');
-            audios[1] = entry.querySelector(".us.dpron-i source");
-            audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
+            audios[1] = entry.querySelector('.pos-header>.us .audio_play_button');
+            audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('data-src-mp3') : '';
             //audios[1] = audios[1].replace('https', 'http');
 
             let sensbodys = entry.querySelectorAll('.sense-body') || [];
@@ -84,7 +84,7 @@ class encn_Cambridge {
 
                     // make definition segement
                     for (const defblock of defblocks) {
-                        let eng_tran = T(defblock.querySelector('.ddef_h .def'));
+                        let eng_tran = T(defblock.querySelector('.def-head .def'));
                         let chn_tran = T(defblock.querySelector('.def-body .trans'));
                         if (!eng_tran) continue;
                         let definition = '';
@@ -119,6 +119,36 @@ class encn_Cambridge {
             });
         }
         return notes;
+    }
+
+        function getYDTrans(doc) {
+            let notes = [];
+
+            //get Youdao EC data: check data availability
+            let transNode = doc.querySelectorAll('#ydTrans .trans-container p')[1];
+            if (!transNode) return notes;
+
+            let definition = `${T(transNode)}`;
+            let css = `
+                <style>
+                    .odh-expression {
+                        font-size: 1em!important;
+                        font-weight: normal!important;
+                    }
+                </style>`;
+            notes.push({
+                css,
+                definitions: [definition],
+            });
+            return notes;
+        }
+
+        function T(node) {
+            if (!node)
+                return '';
+            else
+                return node.innerText.trim();
+        }
     }
 
     renderCSS() {
