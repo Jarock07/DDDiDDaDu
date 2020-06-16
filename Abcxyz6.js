@@ -7,7 +7,7 @@ class encn_Cambridge_tc {
     }
 
     async displayName() {
-        return 'Cambridge EN->EN Dictionary 5';
+        return 'Cambridge EN->EN Dictionary 6';
     }
 
     setOptions(options) {
@@ -98,8 +98,7 @@ class encn_Cambridge_tc {
                             for (const [index, examp] of examps.entries()) {
                                 if (index > this.maxexample - 1) break; // to control only 2 example sentence.
                                 let eng_examp = T(examp.querySelector('.eg'));
-                                let chn_examp = T(examp.querySelector('.trans'));
-                                definition += `<li class='sent'><span class='eng_sent'>${eng_examp.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span><span class='chn_sent'>${chn_examp}</span></li>`;
+                                definition += `<li class='sent'><span class='eng_sent'>${eng_examp.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span></li>`;
                             }
                             definition += '</ul>';
                         }
