@@ -7,7 +7,10 @@ class encn_Cambridge {
     }
 
     async displayName() {
-        return 'Cambridge EN->EN Dictionary';
+        let locale = await api.locale();
+        if (locale.indexOf('CN') != -1) return '剑桥英汉双解(简体)';
+        if (locale.indexOf('TW') != -1) return '劍橋英漢雙解(簡體)';
+        return 'Cambridge EN->CN Dictionary (SC)';
     }
 
     setOptions(options) {
@@ -119,36 +122,6 @@ class encn_Cambridge {
             });
         }
         return notes;
-    }
-
-        function getYDTrans(doc) {
-            let notes = [];
-
-            //get Youdao EC data: check data availability
-            let transNode = doc.querySelectorAll('#ydTrans .trans-container p')[1];
-            if (!transNode) return notes;
-
-            let definition = `${T(transNode)}`;
-            let css = `
-                <style>
-                    .odh-expression {
-                        font-size: 1em!important;
-                        font-weight: normal!important;
-                    }
-                </style>`;
-            notes.push({
-                css,
-                definitions: [definition],
-            });
-            return notes;
-        }
-
-        function T(node) {
-            if (!node)
-                return '';
-            else
-                return node.innerText.trim();
-        }
     }
 
     renderCSS() {
