@@ -120,6 +120,37 @@ class encn_Cambridge {
         }
         return notes;
     }
+
+        function getYDTrans(doc) {
+            let notes = [];
+
+            //get Youdao EC data: check data availability
+            let transNode = doc.querySelectorAll('#ydTrans .trans-container p')[1];
+            if (!transNode) return notes;
+
+            let definition = `${T(transNode)}`;
+            let css = `
+                <style>
+                    .odh-expression {
+                        font-size: 1em!important;
+                        font-weight: normal!important;
+                    }
+                </style>`;
+            notes.push({
+                css,
+                definitions: [definition],
+            });
+            return notes;
+        }
+
+        function T(node) {
+            if (!node)
+                return '';
+            else
+                return node.innerText.trim();
+        }
+    }
+
     renderCSS() {
         let css = `
             <style>
